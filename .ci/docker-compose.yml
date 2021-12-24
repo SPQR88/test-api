@@ -1,0 +1,33 @@
+version: '3.5'
+
+networks:
+  test-api-ntw:
+    driver: bridge
+
+services:
+  backend:
+    build:
+      context: ./../
+      dockerfile: ./.ci/Dockerfile
+    container_name: test-api-backend
+    ports:
+      - "8080:8080"
+    restart: on-failure
+    stdin_open: true
+    networks:
+      - test-api-ntw
+
+  postgres:
+    image: postgres:10-alpine
+    container_name: test-api-db
+    environment:
+      POSTGRES_USER: 'postgres'
+      POSTGRES_PASSWORD: '123456'
+      SCHEMA: 'public'
+    ports:
+      - 54323:5432
+    volumes:
+      - /var/www/test-api/postgres-db:/var/lib/postgresql/data
+    restart: on-failure
+    networks:
+      - test-api-ntw
